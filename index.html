@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Reddit Images</title>
+
+	<script src="scripts/angular.min.js"></script>
+	<script src="scripts/angular-resource.min.js"></script>
+	<script src="scripts/underscore-min.js"></script>
+	<script src="scripts/main.js"></script>
+
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans|Vollkorn" rel="stylesheet" type="text/css">
+	<link href="css/elusive-webfont.css" rel="stylesheet" type="text/css">
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body ng-app="main" ng-controller="MainCtrl">
+	<nav>
+		<ul>
+			<li><a class="current" href="/reddit-images"><i class="icon-picture"></i></a></li>
+			<li><a href="/scour"><i class="icon-network"></i></a></li>
+			<li><a href="/portfolio"><i class="icon-home-alt"></i></a></li>
+			<li><a target="_blank" href="https://github.com/rphillips-nz"><i class="icon-github"></i></a></li>
+			<li><a target="_blank" href="http://nz.linkedin.com/pub/ross-phillips/37/132/255"><i class="icon-linkedin"></i></a></li>
+		</ul>
+	</nav>
+
+	<h1>Reddit Images</h1>
+
+	<ul class="subreddits">
+		<li ng-repeat="subreddit in subreddits"
+		    ng-click="toggle(subreddit)"
+		    ng-class="{selected: subreddit.selected}">{{subreddit.name}}</li>
+	</ul>
+
+	<ul class="listings">
+		<li class="listing {{item.listing_type}}"
+		    ng-repeat="item in items"
+		    ng-show="isSelected(item.subredditName)"
+		    ng-switch on="item.listing_type">
+			<div ng-switch-when="image-album">
+				<img ng-src="{{item.data.thumbnail}}" />
+				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+			</div>
+
+			<div ng-switch-when="image">
+				<img ng-src="{{item.data.url}}" />
+				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+			</div>
+
+			<div ng-switch-when="post">
+				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+			</div>
+
+		</li>
+	</ul>
+
+</body>
+
+</html>
+

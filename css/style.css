@@ -1,0 +1,107 @@
+body {
+	text-align: center;
+	font-family: "Open Sans", sans-serif;
+	color: #333;
+	background: #f8f8f8 url(../images/gray_jean.png);
+	margin: 0;
+	padding: 0;
+}
+
+nav {
+	width: 100%;
+	height: 50px;
+	margin: 0;
+	padding: 0;
+	background-color: #222;
+	border-bottom: 1px solid #888;
+	position: fixed;
+	top: 0;
+	z-index: 10;
+}
+
+nav ul {
+	list-style-type: none;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+	font-size: 2.5em;
+}
+
+nav li {
+	display: inline-block;
+}
+
+nav a {
+	height: 50px;
+}
+
+nav a:link, nav a:visited {
+	color: #ddd;
+	text-decoration: none;
+}
+
+nav a:hover, nav a:active, nav a.current {
+	color: #1b86ff !important;
+	text-decoration: none;
+}
+
+h1 {
+	font: 800 64px/64px "Vollkorn";
+	letter-spacing: 1em;
+	padding-left: 1em;
+	text-transform: uppercase;
+	font-size: 1.5em;
+	margin-top:	70px;
+}
+
+a:link, a:visited {
+	color: #1b86ff;
+	text-decoration: none;
+}
+
+a:hover, a:active {
+	text-decoration: underline;
+}
+
+.subreddits {
+	margin: 0 0 40px 0;
+}
+
+.subreddits li {
+	color: #aaa;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.subreddits li + li {
+	margin-left: 1em;
+}
+
+.subreddits li.selected {
+	color: #555;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.listing:after {
+	border-top: 1px dashed gray;
+	width: 50%;
+	content: " ";
+	margin: 40px auto 0 auto;
+	display: block;
+}
+
+.listing + .listing {
+	padding-top: 20px;
+	margin-top: 0;
+}
+
+.listings .image img {
+	max-width: 100%;
+	/*height: 40px;*/
+	padding-top: 10px;
+}
