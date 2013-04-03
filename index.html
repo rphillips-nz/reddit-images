@@ -7,6 +7,7 @@
 
 	<script src="scripts/angular.min.js"></script>
 	<script src="scripts/angular-resource.min.js"></script>
+	<script src="scripts/angular-cookies.min.js"></script>
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
@@ -16,6 +17,8 @@
 </head>
 
 <body ng-app="main" ng-controller="MainCtrl">
+	<h1>Reddit Images</h1>
+
 	<nav>
 		<ul>
 			<li><a class="current" href="/reddit-images"><i class="icon-picture"></i></a></li>
@@ -25,8 +28,6 @@
 			<li><a target="_blank" href="http://nz.linkedin.com/pub/ross-phillips/37/132/255"><i class="icon-linkedin"></i></a></li>
 		</ul>
 	</nav>
-
-	<h1>Reddit Images</h1>
 
 	<ul class="subreddits">
 		<li ng-repeat="subreddit in subreddits"
@@ -39,14 +40,27 @@
 		    ng-repeat="item in items"
 		    ng-show="isSelected(item.subredditName)"
 		    ng-switch on="item.listing_type">
+
 			<div ng-switch-when="image-album">
-				<img ng-src="{{item.data.thumbnail}}" />
 				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+
+				<img ng-src="{{item.data.thumbnail}}" />
+
+				<p class="controls">
+					<a ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
+					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i></a>
+				</p>
 			</div>
 
 			<div ng-switch-when="image">
+				<p class="title">{{item.data.title}}</p>
+
 				<img ng-src="{{item.data.url}}" />
-				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+
+				<p class="controls">
+					<a ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
+					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i></a>
+				</p>
 			</div>
 
 			<div ng-switch-when="post">

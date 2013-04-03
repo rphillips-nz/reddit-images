@@ -1,4 +1,4 @@
-angular.module('main', ['ngResource'])
+angular.module('main', ['ngResource', 'ngCookies'])
 
 .factory('Reddit', ['$resource', function($resource) {
 	return $resource(
@@ -8,23 +8,50 @@ angular.module('main', ['ngResource'])
 	);
 }])
 
-.controller('MainCtrl', ['$scope', 'Reddit', function($scope, Reddit) {
-
+.controller('MainCtrl', ['$scope', '$cookies', 'Reddit', function($scope, $cookies, Reddit) {
 	$scope.items = [];
 
-	function search(subreddit) {
-		Reddit.get({subreddit: subreddit.name}, function onSuccess(result) {
+	$scope.$watch('subreddits', function() {
+		$cookies.subreddits = _.pluck(_.where($scope.subreddits, {selected: true}), 'name').toString();
+	}, true);
+
+	var defaultSubreddits = [
+		'fixedgearbicycle',
+		'gaming',
+		'funny',
+		'gifs',
+		'pictures',
+		'snowboarding',
+		'cats',
+		'aww'
+	];
+
+	$scope.subreddits = _.map(defaultSubreddits, function(subredditName) {
+		return {
+			name: subredditName,
+			selected: $cookies.subreddits.indexOf(subredditName) >= 0,
+			searched: false
+		};
+	});
+
+	function isImage(url) { return /jpg|png|gif|jpeg/i.test(url); }
+	function isImgur(url) { return /imgur\.com/i.test(url); }
+	function isImgurAlbum(url) { return /imgur\.com\/a\//i.test(url); }
+
+	var search = function(subreddit) {
+		subreddit.searched = true;
+
+		Reddit.get({subreddit: subreddit.name}, function success(result) {
 			_.each(result.data.children, function(item) {
 				item.subredditName = subreddit.name;
 
-				if (_.contains(['i.imgur.com', 'imgur.com'], item.data.domain)) {
+				if (isImage(item.data.url)) {
 					item.listing_type = 'image';
-
-					if (/\/a\//i.test(item.data.url)) {
-						item.listing_type = 'image-album';
-					} else if (!/jpg|png|gif|jpeg/i.test(item.data.url)) {
-						item.data.url = item.data.url + '.png';
-					}
+				} else if (isImgurAlbum(item.data.url)) {
+					item.listing_type = 'image-album';
+				} else if (isImgur(item.data.url)) {
+					item.listing_type = 'image';
+					item.data.url = item.data.url + '.png';
 				} else {
 					item.listing_type = 'post';
 				}
@@ -34,32 +61,24 @@ angular.module('main', ['ngResource'])
 		});
 	}
 
-	$scope.subreddits = [
-		{name: 'fixedgearbicycle', selected: true, searching: false},
-		{name: 'gaming', selected: false, searching: false},
-		{name: 'webdev', selected: true, searching: false},
-		{name: 'technology', selected: false, searching: false},
-		{name: 'pictures', selected: false, searching: false},
-		{name: 'cats', selected: false, searching: false}
-	];
-
 	function searchSelected() {
-		_.each(selectedSubreddits(), function(subreddit) {
-			if (subreddit.selected && !subreddit.searching) {
-				subreddit.searching = true;
-				search(subreddit);
-			}
-		});
+		_.chain($scope.subreddits)
+			.where({selected: true, searched: false})
+			.each(function(subreddit) { search(subreddit); });
 	}
 
-	function selectedSubreddits() { return _.where($scope.subreddits, {selected: true}); };
+	$scope.toggle = function(subreddit) {
+		subreddit.selected = !subreddit.selected;
+		searchSelected();
+	};
 
-	$scope.toggle = function(subreddit) { subreddit.selected = !subreddit.selected; searchSelected(); };
 	$scope.isSelected = function(subredditName) {
 		return _.where($scope.subreddits, {selected: true, name: subredditName}).length > 0;
 	};
 
-	$scope.contains = function(list, value) { return _.contains(list, value); };
+	$scope.contains = function(list, value) {
+		return _.contains(list, value);
+	};
 
 	searchSelected();
 
