@@ -36,7 +36,7 @@ angular.module('main', ['ngResource', 'ngCookies'])
 
 	function isImage(url) { return /jpg|png|gif|jpeg/i.test(url); }
 	function isImgur(url) { return /imgur\.com/i.test(url); }
-	function isImgurAlbum(url) { return /imgur\.com\/(a|gallery)\//i.test(url); }
+	function isImgurAlbum(url) { return /imgur\.com\/a\//i.test(url); }
 	function isFlickr(url) { return /flickr\.com/i.test(url); }
 
 	var search = function(subreddit) {
@@ -49,7 +49,7 @@ angular.module('main', ['ngResource', 'ngCookies'])
 				if (isImage(item.data.url)) {
 					item.listing_type = 'image';
 				} else if (isImgurAlbum(item.data.url)) {
-					item.listing_type = 'image-thumbnail';
+					item.listing_type = 'image-album';
 				} else if (isImgur(item.data.url)) {
 					item.listing_type = 'image';
 					item.data.url = item.data.url + '.png';
