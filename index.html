@@ -41,8 +41,8 @@
 		    ng-show="isSelected(item.subredditName)"
 		    ng-switch on="item.listing_type">
 
-			<div ng-switch-when="image-album">
-				<p><a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a></p>
+			<div ng-switch-when="image-thumbnail">
+				<p>{{item.data.title}}</p>
 
 				<img ng-src="{{item.data.thumbnail}}" />
 
