@@ -8,6 +8,7 @@
 	<script src="scripts/angular.min.js"></script>
 	<script src="scripts/angular-resource.min.js"></script>
 	<script src="scripts/angular-cookies.min.js"></script>
+	<script src="scripts/angular-sanitize.min.js"></script>
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
@@ -38,28 +39,24 @@
 	<ul class="listings">
 		<li class="listing {{item.listing_type}}"
 		    ng-repeat="item in items"
-		    ng-show="isSelected(item.subredditName)"
-		    ng-switch on="item.listing_type">
+		    ng-show="isSelected(item.subredditName)">
 
-			<div ng-switch-when="image">
+			<div>
 				<p class="title">{{item.data.title}}</p>
 
-				<img ng-src="{{item.data.url}}" />
+				<div ng-switch on="item.listing_type">
+					<img ng-switch-when="image" ng-src="{{item.data.url}}" />
+					<img ng-switch-when="image-album" ng-src="{{item.data.thumbnail}}" />
+					<img ng-switch-when="image-thumbnail" ng-src="{{item.data.thumbnail}}" />
+					<div class="video-container" ng-switch-when="media">
+						<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
+					</div>
+					<p ng-switch-default>{{item.data.selftext}}</p>
+				</div>
 
 				<p class="controls">
-					<a ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
-					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i></a>
-				</p>
-			</div>
-
-			<div ng-switch-default>
-				<p>{{item.data.title}}</p>
-
-				<img ng-src="{{item.data.thumbnail}}" />
-
-				<p class="controls">
-					<a ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
-					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i></a>
+					<a class="open" ng-hide="item.listing_type === 'post'" ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
+					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i><span>{{item.data.num_comments}}</span></a>
 				</p>
 			</div>
 

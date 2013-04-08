@@ -1,4 +1,4 @@
-angular.module('main', ['ngResource', 'ngCookies'])
+angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 .factory('Reddit', ['$resource', function($resource) {
 	return $resource(
@@ -34,10 +34,10 @@ angular.module('main', ['ngResource', 'ngCookies'])
 		};
 	});
 
-	function isImage(url) { return /jpg|png|gif|jpeg/i.test(url); }
-	function isImgur(url) { return /imgur\.com/i.test(url); }
-	function isImgurAlbum(url) { return /imgur\.com\/a\//i.test(url); }
-	function isFlickr(url) { return /flickr\.com/i.test(url); }
+	function isImage(url) { return (/jpg|png|gif|jpeg/i).test(url); }
+	function isImgur(url) { return (/imgur\.com/i).test(url); }
+	function isImgurAlbum(url) { return (/imgur\.com\/a\//i).test(url); }
+	function isFlickr(url) { return (/flickr\.com/i).test(url); }
 
 	var search = function(subreddit) {
 		subreddit.searched = true;
@@ -50,19 +50,23 @@ angular.module('main', ['ngResource', 'ngCookies'])
 					item.listing_type = 'image';
 				} else if (isImgurAlbum(item.data.url)) {
 					item.listing_type = 'image-album';
-				} else if (isImgur(item.data.url)) {
+				} else if (isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
 					item.listing_type = 'image';
 					item.data.url = item.data.url + '.png';
-				} else if(isFlickr(item.data.url)) {
+				} else if (isFlickr(item.data.url)) {
 					item.listing_type = 'image-thumbnail';
-				} else {
+				} else if (!_.isNull(item.data.media)) {
+					item.listing_type = 'media';
+				} else if (item.data.is_self) {
 					item.listing_type = 'post';
+				} else {
+					item.listing_type = 'link';
 				}
 			});
 
 			$scope.items = $scope.items.concat(result.data.children);
 		});
-	}
+	};
 
 	function searchSelected() {
 		_.chain($scope.subreddits)
@@ -81,6 +85,10 @@ angular.module('main', ['ngResource', 'ngCookies'])
 
 	$scope.contains = function(list, value) {
 		return _.contains(list, value);
+	};
+
+	$scope.unescape = function(html) {
+		return _.unescape(html);
 	};
 
 	searchSelected();
