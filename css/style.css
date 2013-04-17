@@ -102,11 +102,14 @@ a:hover, a:active {
 	margin-top: 0;
 }
 
+.listings .full-image {
+	width: 95%;
+}
+
 .listings img {
 	padding-top: 0;
 	margin-top: 0;
 	border: 1px solid #333;
-	width: 95%;
 }
 
 .listing .controls {

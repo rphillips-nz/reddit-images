@@ -3,6 +3,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1" />
 	<title>Reddit Images</title>
 
 	<script src="scripts/angular.min.js"></script>
@@ -15,6 +16,7 @@
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans|Vollkorn" rel="stylesheet" type="text/css">
 	<link href="css/elusive-webfont.css" rel="stylesheet" type="text/css">
 	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<link href="images/favicon.png" rel="icon" type="image/png">
 </head>
 
 <body ng-app="main" ng-controller="MainCtrl">
@@ -45,9 +47,9 @@
 				<p class="title">{{item.data.title}}</p>
 
 				<div ng-switch on="item.listing_type">
-					<img ng-switch-when="image" ng-src="{{item.data.url}}" />
-					<img ng-switch-when="image-album" ng-src="{{item.data.thumbnail}}" />
-					<img ng-switch-when="image-thumbnail" ng-src="{{item.data.thumbnail}}" />
+					<img ng-switch-when="image" class="full-image" ng-src="{{item.data.url}}" />
+					<img ng-switch-when="image-album" class="thumbnail" ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" />
+					<img ng-switch-when="image-thumbnail" class="thumbnail" ng-src="{{item.data.thumbnail}}" />
 					<div class="video-container" ng-switch-when="media">
 						<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
 					</div>
