@@ -1,0 +1,141 @@
+body {
+	text-align: center;
+	font-family: "Raleway", sans-serif;
+	color: #333;
+	background-color: #ddd;
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: 3em;
+	font-weight: 100;
+	margin: 0 0 30px 0;
+	padding: 0;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+section, footer, .listing {
+	padding: 40px 10px;
+	margin: 0;
+}
+
+.main {
+	background-color: #b8b8b8;
+	border-bottom: 5px solid #b1b1b1;
+}
+
+
+
+.subreddits {
+	margin: 0;
+}
+
+.subreddits li {
+	display: inline-block;
+	cursor: pointer;
+}
+
+.subreddits li + li {
+	margin-left: 1em;
+}
+
+.subreddits li.selected {
+	border-bottom: 1px solid;
+}
+
+
+
+.listings {
+	padding: 0;
+	margin: 0;
+}
+
+
+
+.listing:nth-child(even) {
+	background-color: #cfcfcf;
+}
+
+.listings .full-image {
+	width: 95%;
+}
+
+.listings img {
+	padding-top: 0;
+	margin-top: 0;
+	border: 1px solid #333;
+}
+
+.listing .controls {
+	text-align: center;
+}
+
+.listing {
+	font-size: 1em;
+	font-weight: 200;
+	margin: 0 auto;
+}
+
+.listing > .content {
+	max-width: 700px;
+	margin: 0 auto;
+}
+
+
+
+
+.listing a:link, .listing a:visited {
+	color: #333;
+	text-decoration: none;
+}
+
+.listing a:hover, .listing a:active {
+	color: #1b86ff;
+	text-decoration: none;
+}
+
+.controls a + a {
+	margin-left: 10px;
+}
+
+.controls span {
+	position: relative;
+	top: -3px;
+	left: 1px;
+	font-size: 0.7em;
+}
+
+.controls .open {
+	font-size: 0.95em;
+	position: relative;
+	top: -1px;
+}
+
+
+
+
+.video-container {
+	position: relative;
+	padding-bottom: 56.25%;
+	padding-top: 30px;
+	height: 0;
+	overflow: hidden;
+	max-width: 95%;
+	margin: 0 auto;
+}
+
+.video-container iframe,  
+.video-container object,  
+.video-container embed {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}

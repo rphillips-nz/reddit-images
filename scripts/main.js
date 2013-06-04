@@ -29,7 +29,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 	$scope.subreddits = _.map(defaultSubreddits, function(subredditName) {
 		return {
 			name: subredditName,
-			selected: $cookies.subreddits.indexOf(subredditName) >= 0,
+			selected: $cookies.subreddits && $cookies.subreddits.indexOf(subredditName) >= 0,
 			searched: false
 		};
 	});

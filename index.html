@@ -13,38 +13,32 @@
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans|Vollkorn" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Raleway:200,100" rel="stylesheet" type="text/css">
 	<link href="css/elusive-webfont.css" rel="stylesheet" type="text/css">
-	<link href="css/style.css" rel="stylesheet" type="text/css">
-	<link href="images/favicon.png" rel="icon" type="image/png">
+	<link href="css/flat.css" rel="stylesheet" type="text/css">
+	<link href="images/favicon.png" rel="shortcut icon" type="image/png">
 </head>
 
 <body ng-app="main" ng-controller="MainCtrl">
-	<h1>Reddit Images</h1>
 
-	<nav>
-		<ul>
-			<li><a class="current" href="/reddit-images"><i class="icon-picture"></i></a></li>
-			<li><a href="/scour"><i class="icon-network"></i></a></li>
-			<li><a href="/portfolio"><i class="icon-home-alt"></i></a></li>
-			<li><a target="_blank" href="https://github.com/rphillips-nz"><i class="icon-github"></i></a></li>
-			<li><a target="_blank" href="http://nz.linkedin.com/pub/ross-phillips/37/132/255"><i class="icon-linkedin"></i></a></li>
+	<section class="main">
+		<h1>Reddit Images</h1>
+
+		<ul class="subreddits">
+			<li ng-repeat="subreddit in subreddits"
+			    ng-click="toggle(subreddit)"
+			    ng-class="{selected: subreddit.selected}">{{subreddit.name}}</li>
 		</ul>
-	</nav>
-
-	<ul class="subreddits">
-		<li ng-repeat="subreddit in subreddits"
-		    ng-click="toggle(subreddit)"
-		    ng-class="{selected: subreddit.selected}">{{subreddit.name}}</li>
-	</ul>
+	</section>
 
 	<ul class="listings">
 		<li class="listing {{item.listing_type}}"
 		    ng-repeat="item in items"
 		    ng-show="isSelected(item.subredditName)">
 
-			<div>
+			<div class="content">
 				<p class="title">{{item.data.title}}</p>
+				<!-- <p>{{item.listing_type}}</p> -->
 
 				<div ng-switch on="item.listing_type">
 					<img ng-switch-when="image" class="full-image" ng-src="{{item.data.url}}" />
