@@ -56,9 +56,9 @@
 				<!-- <p>{{item.listing_type}}</p> -->
 
 				<div ng-switch on="item.listing_type">
-					<img ng-switch-when="image" class="full-image" ng-src="{{item.data.url}}" />
-					<img ng-switch-when="image-album" class="thumbnail" ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" />
-					<img ng-switch-when="image-thumbnail" class="thumbnail" ng-src="{{item.data.thumbnail}}" />
+					<img ng-switch-when="image" class="full-image" ng-src="{{item.data.url}}" onerror="this.style.display='none'" />
+					<img ng-switch-when="image-album" class="thumbnail" ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" onerror="this.style.display='none'" />
+					<img ng-switch-when="image-thumbnail" class="thumbnail" ng-src="{{item.data.thumbnail}}" onerror="this.style.display='none'" />
 					<div class="video-container" ng-switch-when="media">
 						<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
 					</div>
