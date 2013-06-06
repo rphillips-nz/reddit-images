@@ -54,8 +54,8 @@
 
 	<ul class="listings">
 		<li class="listing {{item.listing_type}}"
-		    ng-repeat="item in items"
-		    ng-show="isSelected(item.subredditName)">
+		    ng-repeat="item in items | orderBy:'index'"
+		    ng-show="isSelected(item.subreddit.name)">
 
 			<div class="content">
 				<p ng-bind-html="item.data.title"></p>

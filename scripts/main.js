@@ -44,8 +44,9 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 		subreddit.searched = true;
 
 		Reddit.get({subreddit: subreddit.name}, function success(result) {
-			_.each(result.data.children, function(item) {
-				item.subredditName = subreddit.name;
+			_.each(result.data.children, function(item, index) {
+				item.subreddit = subreddit;
+				item.index = index;
 
 				if (isImage(item.data.url)) {
 					item.listing_type = 'image';
@@ -104,6 +105,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 	$scope.removeSubreddit = function(subreddit) {
 		$scope.subreddits = _.reject($scope.subreddits, function(s) { return subreddit === s; });
+		$scope.items = _.reject($scope.items, function(i) { return subreddit == i.subreddit; });
 	};
 
 	$scope.openSubredditForm = function() {
