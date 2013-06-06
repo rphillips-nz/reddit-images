@@ -41,6 +41,8 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 	var search = function(subreddit) {
 		subreddit.searched = true;
+		console.log('searching:');
+		console.log(subreddit);
 
 		Reddit.get({subreddit: subreddit.name}, function success(result) {
 			_.each(result.data.children, function(item) {
@@ -77,6 +79,33 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 	$scope.toggle = function(subreddit) {
 		subreddit.selected = !subreddit.selected;
 		searchSelected();
+	};
+
+	$scope.addSubreddit = function() {
+		var name = $scope.newSubredditName.trim();
+		var existing = _.findWhere($scope.subreddits, {name: name});
+
+		if (existing) {
+			existing.selected = true;
+			search(existing);
+		} else if (name !== '') {
+			var newSubreddit = {
+				name: $scope.newSubredditName,
+				selected: true,
+				searched: false
+			};
+
+			$scope.subreddits.push(newSubreddit);
+			search(newSubreddit);
+		}
+
+		$scope.newSubredditName = '';
+		$scope.addOpen = false;
+	};
+
+	$scope.openSubredditForm = function() {
+		$scope.addOpen = true;
+		$('subreddit-name-field').focus();
 	};
 
 	$scope.isSelected = function(subredditName) {

@@ -13,7 +13,7 @@
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
-	<link href="http://fonts.googleapis.com/css?family=Raleway:200,100" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Raleway:200,100|Open+Sans" rel="stylesheet" type="text/css">
 	<link href="css/elusive-webfont.css" rel="stylesheet" type="text/css">
 	<link href="css/flat.css" rel="stylesheet" type="text/css">
 	<link href="images/favicon.png" rel="shortcut icon" type="image/png">
@@ -29,6 +29,19 @@
 			    ng-click="toggle(subreddit)"
 			    ng-class="{selected: subreddit.selected}">{{subreddit.name}}</li>
 		</ul>
+
+		<div class="subreddit-actions">
+			<div class="subreddit-controls" ng-hide="addOpen">
+				<button class="subreddit-add" ng-click="openSubredditForm()"><i class="icon-plus"></i></button>
+				<button class="subreddit-remove"><i class="icon-minus"></i></button>
+			</div>
+
+			<form class="add-form" ng-submit="addSubreddit()" ng-show="addOpen">
+				<input type="text" class="subreddit-name-field" ng-model="newSubredditName" placeholder="subreddit name"/>
+				<button class="add-button"><i class="icon-ok"></i></button>
+				<button onclick="return false;" class="cancel-button" ng-click="addOpen = false"><i class="icon-remove"></i></button>
+			</form>
+		</div>
 	</section>
 
 	<ul class="listings">
@@ -37,7 +50,9 @@
 		    ng-show="isSelected(item.subredditName)">
 
 			<div class="content">
-				<p class="title">{{item.data.title}}</p>
+				<p class="title">
+					{{item.data.title}}
+				</p>
 				<!-- <p>{{item.listing_type}}</p> -->
 
 				<div ng-switch on="item.listing_type">
@@ -50,10 +65,19 @@
 					<p ng-switch-default>{{item.data.selftext}}</p>
 				</div>
 
-				<p class="controls">
-					<a class="open" ng-hide="item.listing_type === 'post'" ng-href="{{item.data.url}}" target="_blank"><i class="icon-fullscreen"></i></a>
-					<a ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank"><i class="icon-comment"></i><span>{{item.data.num_comments}}</span></a>
+				<p class="details">
+					<a class="detail" ng-href="http://www.reddit.com/u/{{item.data.author}}" target="_blank"><i class="icon-user"></i> {{item.data.author}}</a>
+					<span class="detail"><i class="icon-thumbs-up"></i> {{item.data.score}}</span>
 				</p>
+
+				<p class="controls">
+					<a class="control open" ng-hide="item.listing_type === 'post'" ng-href="{{item.data.url}}" target="_blank" ng-switch="item.listing_type">
+						<i ng-switch-when="image" class="icon-fullscreen"></i>
+						<i ng-switch-default="" class="icon-globe"></i>
+					</a>
+					<a class="control" ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank" ><i class="icon-comment"></i><span class="num-comments">{{item.data.num_comments}}</span></a>
+				</p>
+
 			</div>
 
 		</li>
