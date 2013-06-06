@@ -36,24 +36,35 @@ section, footer, .listing {
 	margin: 0;
 }
 
-.subreddits li {
+.subreddit {
+	position: relative;
 	display: inline-block;
 	cursor: pointer;
+	padding: 5px;
 }
 
-.subreddits li + li {
+.subreddit + .subreddit {
 	margin-left: 1em;
 }
 
-.subreddits li.selected {
+.subreddit.selected {
 	color: #4980df;
 }
+
+.remove-subreddit {
+	position: absolute;
+	right: -14px;
+	top: -3px;
+	opacity: 0.9;
+	color: #7e2a68;
+}
+
 
 .subreddit-actions {
 	margin: 30px 10px 0 10px;
 }
 
-.subreddit-controls, .add-form {
+.subreddit-controls, .add-form, .remove-form {
 	font-size: 1em;
 	height: 28px;
 }

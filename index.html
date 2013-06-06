@@ -25,15 +25,19 @@
 		<h1>Reddit Images</h1>
 
 		<ul class="subreddits">
-			<li ng-repeat="subreddit in subreddits"
+			<li class="subreddit"
+			    ng-repeat="subreddit in subreddits"
 			    ng-click="toggle(subreddit)"
-			    ng-class="{selected: subreddit.selected}">{{subreddit.name}}</li>
+			    ng-class="{selected: subreddit.selected}">
+				{{subreddit.name}}
+				<button class="remove-subreddit" ng-show="removeOpen" ng-click="removeSubreddit(subreddit)"><i class="icon-remove-sign"></i></button>
+			</li>
 		</ul>
 
 		<div class="subreddit-actions">
-			<div class="subreddit-controls" ng-hide="addOpen">
+			<div class="subreddit-controls" ng-hide="addOpen || removeOpen">
 				<button class="subreddit-add" ng-click="openSubredditForm()"><i class="icon-plus"></i></button>
-				<button class="subreddit-remove"><i class="icon-minus"></i></button>
+				<button class="subreddit-remove" ng-click="removeOpen = true"><i class="icon-minus"></i></button>
 			</div>
 
 			<form class="add-form" ng-submit="addSubreddit()" ng-show="addOpen">
@@ -41,6 +45,10 @@
 				<button class="add-button"><i class="icon-ok"></i></button>
 				<button onclick="return false;" class="cancel-button" ng-click="addOpen = false"><i class="icon-remove"></i></button>
 			</form>
+
+			<button class="remove-form" ng-show="removeOpen" ng-click="removeOpen = false">
+				<i class="icon-ok"></i>
+			</button>
 		</div>
 	</section>
 
@@ -50,9 +58,7 @@
 		    ng-show="isSelected(item.subredditName)">
 
 			<div class="content">
-				<p class="title">
-					{{item.data.title}}
-				</p>
+				<p ng-bind-html="item.data.title"></p>
 				<!-- <p>{{item.listing_type}}</p> -->
 
 				<div ng-switch on="item.listing_type">
@@ -62,7 +68,7 @@
 					<div class="video-container" ng-switch-when="media">
 						<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
 					</div>
-					<p ng-switch-default>{{item.data.selftext}}</p>
+					<p ng-switch-default ng-bind-html="item.data.selftext"></p>
 				</div>
 
 				<p class="details">

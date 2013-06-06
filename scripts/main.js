@@ -37,6 +37,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 	function isImage(url) { return (/jpg|png|gif|jpeg/i).test(url); }
 	function isImgur(url) { return (/imgur\.com/i).test(url); }
 	function isImgurAlbum(url) { return (/imgur\.com\/a\//i).test(url); }
+	function isImgurBlog(url) { return (/imgur\.com\/blog\//i).test(url); }
 	function isFlickr(url) { return (/flickr\.com/i).test(url); }
 
 	var search = function(subreddit) {
@@ -48,7 +49,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 				if (isImage(item.data.url)) {
 					item.listing_type = 'image';
-				} else if (isImgurAlbum(item.data.url)) {
+				} else if (isImgurAlbum(item.data.url) || isImgurBlog(item.data.url)) {
 					item.listing_type = 'image-album';
 				} else if (isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
 					item.listing_type = 'image';
@@ -99,6 +100,10 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 		$scope.newSubredditName = '';
 		$scope.addOpen = false;
+	};
+
+	$scope.removeSubreddit = function(subreddit) {
+		$scope.subreddits = _.reject($scope.subreddits, function(s) { return subreddit === s; });
 	};
 
 	$scope.openSubredditForm = function() {
