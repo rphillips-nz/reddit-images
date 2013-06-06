@@ -27,7 +27,7 @@
 		<ul class="subreddits">
 			<li class="subreddit"
 			    ng-repeat="subreddit in subreddits"
-			    ng-click="toggle(subreddit)"
+			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggle(subreddit)"
 			    ng-class="{selected: subreddit.selected}">
 				{{subreddit.name}}
 				<button class="remove-subreddit" ng-show="removeOpen" ng-click="removeSubreddit(subreddit)"><i class="icon-remove-sign"></i></button>
