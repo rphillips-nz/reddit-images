@@ -1,4 +1,4 @@
-angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
+angular.module('main', ['ngResource', 'ngSanitize'])
 
 .factory('Reddit', ['$resource', function($resource) {
 	return $resource(
@@ -8,31 +8,31 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 	);
 }])
 
-.controller('MainCtrl', ['$scope', '$cookies', 'Reddit', function($scope, $cookies, Reddit) {
+.controller('MainCtrl', ['$scope', 'Reddit', function($scope, Reddit) {
 	$scope.items = [];
 
 	$scope.$watch('subreddits', function() {
-		$cookies.subreddits = _.pluck(_.where($scope.subreddits, {selected: true}), 'name').toString();
+		var cleaned = _.map($scope.subreddits, function(subreddit) {
+			return _.pick(subreddit, 'name', 'selected');
+		});
+
+		localStorage['subreddits'] = JSON.stringify($scope.subreddits);
 	}, true);
 
-	var defaultSubreddits = [
-		'fixedgearbicycle',
-		'gaming',
-		'funny',
-		'gifs',
-		'pictures',
-		'snowboarding',
-		'cats',
-		'aww'
-	];
-
-	$scope.subreddits = _.map(defaultSubreddits, function(subredditName) {
-		return {
-			name: subredditName,
-			selected: $cookies.subreddits && $cookies.subreddits.indexOf(subredditName) >= 0,
-			searched: false
-		};
-	});
+	if (localStorage['subreddits']) {
+		$scope.subreddits = JSON.parse(localStorage['subreddits']);
+	} else {
+		$scope.subreddits = [
+			{name: 'fixedgearbicycle', selected: false, searched: false},
+			{name: 'gaming', selected: false, searched: false},
+			{name: 'funny', selected: false, searched: false},
+			{name: 'gifs', selected: false, searched: false},
+			{name: 'pictures', selected: false, searched: false},
+			{name: 'snowboarding', selected: false, searched: false},
+			{name: 'cats', selected: false, searched: false},
+			{name: 'aww', selected: false, searched: false}
+		];
+	}
 
 	function isQuickmeme(url) { return (/www\.quickmeme\.com/i).test(url); }
 	function isImage(url) { return (/jpg|png|gif|jpeg/i).test(url); }
@@ -72,6 +72,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 					item.listing_type = 'link';
 				}
 
+				// todo: this only handles one link...
 				var re = /\[(.+)\]\((.+)\)/;
 				var output = '<a href="$2">$1</a>';
 				item.data.selftext = item.data.selftext.replace(re, output);
@@ -150,3 +151,15 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 	searchSelected();
 
 }]);
+
+// reset code...
+// localStorage['subreddits'] = JSON.stringify([
+	// 	{name: 'fixedgearbicycle', selected: false, searched: false},
+	// 	{name: 'gaming', selected: false, searched: false},
+	// 	{name: 'funny', selected: false, searched: false},
+	// 	{name: 'gifs', selected: false, searched: false},
+	// 	{name: 'pictures', selected: false, searched: false},
+	// 	{name: 'snowboarding', selected: false, searched: false},
+	// 	{name: 'cats', selected: false, searched: false},
+	// 	{name: 'aww', selected: false, searched: false}
+	// ]);
