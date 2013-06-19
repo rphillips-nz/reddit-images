@@ -34,6 +34,7 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 		};
 	});
 
+	function isQuickmeme(url) { return (/www\.quickmeme\.com/i).test(url); }
 	function isImage(url) { return (/jpg|png|gif|jpeg/i).test(url); }
 	function isImgur(url) { return (/imgur\.com/i).test(url); }
 	function isImgurAlbum(url) { return (/imgur\.com\/a\//i).test(url); }
@@ -50,6 +51,12 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 
 				if (isImage(item.data.url)) {
 					item.listing_type = 'image';
+				} else if (isQuickmeme(item.data.url)) {
+					var quickmemeId = item.data.url.match(/http:\/\/www\.quickmeme\.com\/meme\/(.+)\//i);
+					if (quickmemeId.length > 0) {
+						item.listing_type = 'image';
+						item.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
+					}
 				} else if (isImgurAlbum(item.data.url) || isImgurBlog(item.data.url)) {
 					item.listing_type = 'image-album';
 				} else if (isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
@@ -64,6 +71,10 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 				} else {
 					item.listing_type = 'link';
 				}
+
+				var re = /\[(.+)\]\((.+)\)/;
+				var output = '<a href="$2">$1</a>';
+				item.data.selftext = item.data.selftext.replace(re, output);
 			});
 
 			$scope.items = $scope.items.concat(result.data.children);
@@ -114,6 +125,15 @@ angular.module('main', ['ngResource', 'ngCookies', 'ngSanitize'])
 			document.getElementsByClassName('subreddit-name-field')[0].focus();
 		});
 	};
+
+	$scope.scrollTop = function() {
+		$('html, body').animate({ scrollTop: 0 }, 'fast');
+	};
+
+	$(window).scroll(_.throttle(function() {
+		$scope.showBackToTop = $(window).scrollTop() > $('.main').outerHeight();
+		$scope.$apply();
+	}, 300));
 
 	$scope.isSelected = function(subredditName) {
 		return _.where($scope.subreddits, {selected: true, name: subredditName}).length > 0;
