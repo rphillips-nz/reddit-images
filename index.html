@@ -28,7 +28,7 @@
 		<ul class="subreddits">
 			<li class="subreddit"
 			    ng-repeat="subreddit in subreddits"
-			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggle(subreddit)"
+			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggleSubreddit(subreddit)"
 			    ng-class="{selected: subreddit.selected}">
 				{{subreddit.name}}
 				<button class="remove-subreddit" ng-show="removeOpen" ng-click="removeSubreddit(subreddit)"><i class="icon-remove-sign"></i></button>
@@ -36,15 +36,15 @@
 		</ul>
 
 		<div class="subreddit-actions">
-			<div class="subreddit-controls" ng-hide="addOpen || removeOpen">
+			<div class="subreddit-controls" ng-hide="addSubredditOpen || removeOpen">
 				<button class="subreddit-add" ng-click="openSubredditForm()"><i class="icon-plus"></i></button>
 				<button class="subreddit-remove" ng-click="removeOpen = true"><i class="icon-minus"></i></button>
 			</div>
 
-			<form class="add-form" ng-submit="addSubreddit()" ng-show="addOpen">
+			<form class="add-form" ng-submit="addSubreddit()" ng-show="addSubredditOpen">
 				<input type="text" class="subreddit-name-field" ng-model="newSubredditName" placeholder="subreddit name"/>
 				<button class="add-button"><i class="icon-ok"></i></button>
-				<button onclick="return false;" class="cancel-button" ng-click="addOpen = false"><i class="icon-remove"></i></button>
+				<button onclick="return false;" class="cancel-button" ng-click="addSubredditOpen = false"><i class="icon-remove"></i></button>
 			</form>
 
 			<button class="remove-form" ng-show="removeOpen" ng-click="removeOpen = false">

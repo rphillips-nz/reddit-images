@@ -11,17 +11,56 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 .controller('MainCtrl', ['$scope', 'Reddit', function($scope, Reddit) {
 	$scope.items = [];
 
-	$scope.$watch('subreddits', function() {
-		var cleaned = _.map($scope.subreddits, function(subreddit) {
-			return {name: subreddit.name, selected: subreddit.selected, searched: false};
-		});
-
-		localStorage['subreddits'] = JSON.stringify(cleaned);
-	}, true);
-
 	if (localStorage['subreddits']) {
 		$scope.subreddits = JSON.parse(localStorage['subreddits']);
 	} else {
+		resetDefaultSubreddits();
+	}
+
+	$scope.$watch('subreddits', function() {
+		localStorage['subreddits'] = JSON.stringify(_.map($scope.subreddits, function(subreddit) {
+			return {name: subreddit.name, selected: subreddit.selected, searched: false};
+		}));
+	}, true);
+
+	var Site = {
+		isQuickmeme: function(url) { return (/www\.quickmeme\.com/i).test(url); },
+		quickmemeId: function(url) { return url.match(/http:\/\/www\.quickmeme\.com\/meme\/(.+)\//i); },
+		isImage: function(url) { return (/jpg|png|gif|jpeg/i).test(url); },
+		isImgur: function(url) { return (/imgur\.com/i).test(url); },
+		isImgurAlbum: function(url) { return (/imgur\.com\/a\//i).test(url); },
+		isImgurBlog: function(url) { return (/imgur\.com\/blog\//i).test(url); },
+		isFlickr: function(url) { return (/flickr\.com/i).test(url); }
+	};
+
+	function initialiseItem(item) {
+		if (Site.isImage(item.data.url)) {
+			item.listing_type = 'image';
+		} else if (Site.isQuickmeme(item.data.url)) {
+			var quickmemeId = Site.quickmemeId(item.data.url);
+			if (quickmemeId.length > 0) {
+				item.listing_type = 'image';
+				item.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
+			}
+		} else if (Site.isImgurAlbum(item.data.url) || Site.isImgurBlog(item.data.url)) {
+			item.listing_type = 'image-album';
+		} else if (Site.isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
+			item.listing_type = 'image';
+			item.data.url = item.data.url + '.png';
+		} else if (Site.isFlickr(item.data.url)) {
+			item.listing_type = 'image-thumbnail';
+		} else if (null !== item.data.media) {
+			item.listing_type = 'media';
+		} else if (item.data.is_self) {
+			item.listing_type = 'post';
+		} else {
+			item.listing_type = 'link';
+		}
+
+		return item;
+	}
+
+	function resetDefaultSubreddits() {
 		$scope.subreddits = [
 			{name: 'fixedgearbicycle', selected: false, searched: false},
 			{name: 'gaming', selected: false, searched: false},
@@ -34,59 +73,29 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 		];
 	}
 
-	function isQuickmeme(url) { return (/www\.quickmeme\.com/i).test(url); }
-	function isImage(url) { return (/jpg|png|gif|jpeg/i).test(url); }
-	function isImgur(url) { return (/imgur\.com/i).test(url); }
-	function isImgurAlbum(url) { return (/imgur\.com\/a\//i).test(url); }
-	function isImgurBlog(url) { return (/imgur\.com\/blog\//i).test(url); }
-	function isFlickr(url) { return (/flickr\.com/i).test(url); }
-
-	var search = function(subreddit) {
+	function search(subreddit) {
 		subreddit.searched = true;
 
 		Reddit.get({subreddit: subreddit.name}, function success(result) {
 			_.each(result.data.children, function(item, index) {
+				initialiseItem(item);
 				item.subreddit = subreddit;
 				item.index = index;
-
-				if (isImage(item.data.url)) {
-					item.listing_type = 'image';
-				} else if (isQuickmeme(item.data.url)) {
-					var quickmemeId = item.data.url.match(/http:\/\/www\.quickmeme\.com\/meme\/(.+)\//i);
-					if (quickmemeId.length > 0) {
-						item.listing_type = 'image';
-						item.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
-					}
-				} else if (isImgurAlbum(item.data.url) || isImgurBlog(item.data.url)) {
-					item.listing_type = 'image-album';
-				} else if (isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
-					item.listing_type = 'image';
-					item.data.url = item.data.url + '.png';
-				} else if (isFlickr(item.data.url)) {
-					item.listing_type = 'image-thumbnail';
-				} else if (!_.isNull(item.data.media)) {
-					item.listing_type = 'media';
-				} else if (item.data.is_self) {
-					item.listing_type = 'post';
-				} else {
-					item.listing_type = 'link';
-				}
-
 			});
 
 			$scope.items = $scope.items.concat(result.data.children);
 		});
-	};
+	}
 
-	function searchSelected() {
+	function searchSelectedSubreddits() {
 		_.chain($scope.subreddits)
 			.where({selected: true, searched: false})
 			.each(function(subreddit) { search(subreddit); });
 	}
 
-	$scope.toggle = function(subreddit) {
+	$scope.toggleSubreddit = function(subreddit) {
 		subreddit.selected = !subreddit.selected;
-		searchSelected();
+		searchSelectedSubreddits();
 	};
 
 	$scope.addSubreddit = function() {
@@ -97,18 +106,13 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 			existing.selected = true;
 			search(existing);
 		} else if (name !== '') {
-			var newSubreddit = {
-				name: $scope.newSubredditName,
-				selected: true,
-				searched: false
-			};
-
+			var newSubreddit = {name: $scope.newSubredditName, selected: true, searched: false};
 			$scope.subreddits.push(newSubreddit);
 			search(newSubreddit);
 		}
 
 		$scope.newSubredditName = '';
-		$scope.addOpen = false;
+		$scope.addSubredditOpen = false;
 	};
 
 	$scope.removeSubreddit = function(subreddit) {
@@ -117,7 +121,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	};
 
 	$scope.openSubredditForm = function() {
-		$scope.addOpen = true;
+		$scope.addSubredditOpen = true;
 		_.defer(function() {
 			document.getElementsByClassName('subreddit-name-field')[0].focus();
 		});
@@ -136,26 +140,8 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 		return _.where($scope.subreddits, {selected: true, name: subredditName}).length > 0;
 	};
 
-	$scope.contains = function(list, value) {
-		return _.contains(list, value);
-	};
+	$scope.unescape = _.unescape;
 
-	$scope.unescape = function(html) {
-		return _.unescape(html);
-	};
-
-	searchSelected();
+	searchSelectedSubreddits();
 
 }]);
-
-// reset code...
-// localStorage['subreddits'] = JSON.stringify([
-//	{name: 'fixedgearbicycle', selected: false},
-//	{name: 'gaming', selected: false},
-//	{name: 'funny', selected: false},
-//	{name: 'gifs', selected: false},
-//	{name: 'pictures', selected: false},
-//	{name: 'snowboarding', selected: false},
-//	{name: 'cats', selected: false},
-//	{name: 'aww', selected: false}
-// ]);
