@@ -13,10 +13,10 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 
 	$scope.$watch('subreddits', function() {
 		var cleaned = _.map($scope.subreddits, function(subreddit) {
-			return _.pick(subreddit, 'name', 'selected');
+			return {name: subreddit.name, selected: subreddit.selected, searched: false};
 		});
 
-		localStorage['subreddits'] = JSON.stringify($scope.subreddits);
+		localStorage['subreddits'] = JSON.stringify(cleaned);
 	}, true);
 
 	if (localStorage['subreddits']) {
@@ -72,10 +72,6 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 					item.listing_type = 'link';
 				}
 
-				// todo: this only handles one link...
-				var re = /\[(.+)\]\((.+)\)/;
-				var output = '<a href="$2">$1</a>';
-				item.data.selftext = item.data.selftext.replace(re, output);
 			});
 
 			$scope.items = $scope.items.concat(result.data.children);
@@ -154,12 +150,12 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 
 // reset code...
 // localStorage['subreddits'] = JSON.stringify([
-	// 	{name: 'fixedgearbicycle', selected: false, searched: false},
-	// 	{name: 'gaming', selected: false, searched: false},
-	// 	{name: 'funny', selected: false, searched: false},
-	// 	{name: 'gifs', selected: false, searched: false},
-	// 	{name: 'pictures', selected: false, searched: false},
-	// 	{name: 'snowboarding', selected: false, searched: false},
-	// 	{name: 'cats', selected: false, searched: false},
-	// 	{name: 'aww', selected: false, searched: false}
-	// ]);
+//	{name: 'fixedgearbicycle', selected: false},
+//	{name: 'gaming', selected: false},
+//	{name: 'funny', selected: false},
+//	{name: 'gifs', selected: false},
+//	{name: 'pictures', selected: false},
+//	{name: 'snowboarding', selected: false},
+//	{name: 'cats', selected: false},
+//	{name: 'aww', selected: false}
+// ]);
