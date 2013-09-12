@@ -3,27 +3,35 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Reddit Images</title>
 
-	<script src="scripts/jquery-1.9.1.min.js"></script>
 	<script src="scripts/angular.min.js"></script>
 	<script src="scripts/angular-resource.min.js"></script>
 	<script src="scripts/angular-sanitize.min.js"></script>
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
-	<link href="http://fonts.googleapis.com/css?family=Raleway:200,100|Roboto:100,300" rel="stylesheet" type="text/css">
-	<link href="css/elusive-webfont.css" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Raleway:700,200|Roboto:100,300" rel="stylesheet" type="text/css">
+	<link href="css/fontello.css" rel="stylesheet" type="text/css">
 	<link href="css/flat.css" rel="stylesheet" type="text/css">
 	<link href="images/favicon.png" rel="shortcut icon" type="image/png">
 </head>
 
 <body ng-app="main" ng-controller="MainCtrl">
-	<button class="back-to-top" ng-show="showBackToTop" ng-click="scrollTop()"><i class="icon-chevron-up"></i></button>
+	<button class="back-to-top" ng-show="showBackToTop" ng-click="scrollTop()"><i class="icon-up-circled"></i></button>
 
-	<section class="main">
-		<h1>Reddit Images</h1>
+	<section class="header">
+		<h1>Reddit Images <i class="icon-down-open button-icon" ng-click="showSubredditsDropdown = !showSubredditsDropdown"></i></h1>
+
+		<ul class="subreddits-dropdown" ng-show="showSubredditsDropdown">
+			<li class="subreddit-dropdown"
+			    ng-repeat="subreddit in subreddits"
+			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggleSubreddit(subreddit)"
+			    ng-class="{selected: subreddit.selected}">
+				{{subreddit.name}}
+			</li>
+		</ul>
 
 		<ul class="subreddits">
 			<li class="subreddit"
@@ -31,57 +39,57 @@
 			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggleSubreddit(subreddit)"
 			    ng-class="{selected: subreddit.selected}">
 				{{subreddit.name}}
-				<button class="remove-subreddit" ng-show="removeOpen" ng-click="removeSubreddit(subreddit)"><i class="icon-remove-sign"></i></button>
+				<button class="remove-subreddit" ng-show="removeOpen" ng-click="removeSubreddit(subreddit)"><i class="icon-cancel-circled"></i></button>
 			</li>
 		</ul>
 
 		<div class="subreddit-actions">
 			<div class="subreddit-controls" ng-hide="addSubredditOpen || removeOpen">
-				<button class="subreddit-add" ng-click="openSubredditForm()"><i class="icon-plus"></i></button>
-				<button class="subreddit-remove" ng-click="removeOpen = true"><i class="icon-minus"></i></button>
+				<button class="button-icon" ng-click="openSubredditForm()"><i class="icon-plus-circled"></i></button>
+				<button class="button-icon" ng-click="removeOpen = true"><i class="icon-minus-circled"></i></button>
 			</div>
 
 			<form class="add-form" ng-submit="addSubreddit()" ng-show="addSubredditOpen">
 				<input type="text" class="subreddit-name-field" ng-model="newSubredditName" placeholder="subreddit name"/>
-				<button class="add-button"><i class="icon-ok"></i></button>
-				<button onclick="return false;" class="cancel-button" ng-click="addSubredditOpen = false"><i class="icon-remove"></i></button>
+				<button class="add-button button-icon"><i class="icon-check"></i></button>
+				<button onclick="return false;" class="cancel-button button-icon" ng-click="addSubredditOpen = false"><i class="icon-cancel"></i></button>
 			</form>
 
 			<button class="remove-form" ng-show="removeOpen" ng-click="removeOpen = false">
-				<i class="icon-ok"></i>
+				<i class="icon-check"></i>
 			</button>
 		</div>
 	</section>
 
-	<ul class="listings listings-grid">
+	<ul class="listings">
 		<li class="listing {{item.listing_type}}"
 		    ng-repeat="item in items | orderBy:'index'"
 		    ng-show="isSelected(item.subreddit.name)">
 
-			<div class="content">
-				<div ng-switch on="item.listing_type">
-					<a ng-switch-when="image" ng-href="{{item.data.url}}" target="_blank">
-						<img class="full-image" ng-src="{{item.data.url}}" onerror="this.style.display='none'" />
-					</a>
-					<a ng-switch-when="image-album" ng-href="{{item.data.url}}" target="_blank">
-						<img class="thumbnail" ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" onerror="this.style.display='none'" />
-					</a>
-					<a ng-switch-when="image-thumbnail" ng-href="{{item.data.url}}" target="_blank">
-						<img class="thumbnail" ng-src="{{item.data.thumbnail}}" onerror="this.style.display='none'" />
-					</a>
-					<div class="video-container" ng-switch-when="media">
-						<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
-					</div>
+			<div ng-switch on="item.listing_type">
+				<a ng-switch-when="image" class="full-image" ng-href="{{item.data.url}}" target="_blank">
+					<img ng-src="{{item.data.url}}" onerror="this.style.display='none'" />
+				</a>
+				<a ng-switch-when="image-album" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
+					<img ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" onerror="this.style.display='none'" />
+				</a>
+				<a ng-switch-when="image-thumbnail" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
+					<img ng-src="{{item.data.thumbnail}}" onerror="this.style.display='none'" />
+				</a>
+				<div class="video-container" ng-switch-when="media">
+					<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
 				</div>
+			</div>
 
-				<a ng-href="{{item.data.url}}">
-					<p ng-bind-html="item.data.title"></p>
+			<div class="content">
+				<a ng-href="{{item.data.url}}" target="_blank">
+					<p class="title" ng-bind-html="item.data.title"></p>
 				</a>
 
 				<p ng-if="item.data.selftext" ng-bind-html="item.data.selftext" class="self-text"></p>
 
 				<div class="controls">
-					<span class="control"><i class="icon-caret-up"></i><span class="control-text">{{item.data.score}}</span></span>
+					<span class="control"><i class="icon-heart"></i><span class="control-text">{{item.data.score}}</span></span>
 					<a class="control" ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank" ><i class="icon-comment"></i><span class="control-text">{{item.data.num_comments}}</span></a>
 					<a class="control" ng-href="http://www.reddit.com/u/{{item.data.author}}" target="_blank"><i class="icon-user"></i><span class="control-text">{{item.data.author}}</span></a>
 				</div>

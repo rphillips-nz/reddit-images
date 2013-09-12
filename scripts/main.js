@@ -8,7 +8,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	);
 }])
 
-.controller('MainCtrl', ['$scope', 'Reddit', function($scope, Reddit) {
+.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $window, Reddit) {
 	$scope.items = [];
 
 	if (localStorage['subreddits']) {
@@ -94,6 +94,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	}
 
 	$scope.toggleSubreddit = function(subreddit) {
+		$scope.showSubredditsDropdown = false;
 		subreddit.selected = !subreddit.selected;
 		searchSelectedSubreddits();
 	};
@@ -128,12 +129,13 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	};
 
 	$scope.scrollTop = function() {
-		$('html, body').animate({ scrollTop: 0 }, 'fast');
+		$window.scroll();
 	};
 
-	$(window).scroll(_.throttle(function() {
-		$scope.showBackToTop = $(window).scrollTop() > $('.main').outerHeight();
-		$scope.$apply();
+	angular.element($window).bind('scroll', _.throttle(function() {
+		var old = $scope.showBackToTop;
+		$scope.showBackToTop = $window.scrollY > 30;
+		if (old !== $scope.showBackToTop) $scope.$apply();
 	}, 300));
 
 	$scope.isSelected = function(subredditName) {
