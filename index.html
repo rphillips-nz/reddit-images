@@ -12,7 +12,7 @@
 	<script src="scripts/underscore-min.js"></script>
 	<script src="scripts/main.js"></script>
 
-	<link href="http://fonts.googleapis.com/css?family=Raleway:700,200|Roboto:100,300" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Raleway:700|Roboto:300,700" rel="stylesheet" type="text/css">
 	<link href="css/fontello.css" rel="stylesheet" type="text/css">
 	<link href="css/flat.css" rel="stylesheet" type="text/css">
 	<link href="images/favicon.png" rel="shortcut icon" type="image/png">
@@ -68,7 +68,10 @@
 
 			<div ng-switch on="item.listing_type">
 				<a ng-switch-when="image" class="full-image" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{item.data.url}}" onerror="this.style.display='none'" />
+					<img ng-src="{{optimiseImageUrl(item.data.url)}}" onerror="this.style.display='none'"/>
+				</a>
+				<a ng-switch-when="image-gif" class="full-image" ng-href="{{item.data.url}}" target="_blank">
+					<img ng-src="{{item.data.url}}" onerror="this.style.display='none'"/>
 				</a>
 				<a ng-switch-when="image-album" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
 					<img ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" onerror="this.style.display='none'" />
@@ -76,17 +79,26 @@
 				<a ng-switch-when="image-thumbnail" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
 					<img ng-src="{{item.data.thumbnail}}" onerror="this.style.display='none'" />
 				</a>
+
+
+				<a ng-switch-when="media" class="full-image media" ng-href="{{item.data.url}}" target="_blank">
+					<img ng-src="{{item.data.media.oembed.thumbnail_url}}" onerror="this.style.display='none'"/>
+					<span class="play"><span></span></span>
+				</a>
+<!--
 				<div class="video-container" ng-switch-when="media">
-					<div ng-bind-html-unsafe="unescape(item.data.media.oembed.html)"></div>
+					<div ng-bind-html="unescape(item.data.media.oembed.html)"></div>
 				</div>
+-->
 			</div>
 
 			<div class="content">
-				<a ng-href="{{item.data.url}}" target="_blank">
-					<p class="title" ng-bind-html="item.data.title"></p>
-				</a>
+				<p class="title">
+					<a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a>
+				</p>
+				
 
-				<p ng-if="item.data.selftext" ng-bind-html="item.data.selftext" class="self-text"></p>
+				<p ng-if="item.data.selftext_html" ng-bind-html="unescape(item.data.selftext_html)" class="self-text"></p>
 
 				<div class="controls">
 					<span class="control"><i class="icon-heart"></i><span class="control-text">{{item.data.score}}</span></span>

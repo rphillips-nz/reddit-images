@@ -26,15 +26,19 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	var Site = {
 		isQuickmeme: function(url) { return (/www\.quickmeme\.com/i).test(url); },
 		quickmemeId: function(url) { return url.match(/http:\/\/www\.quickmeme\.com\/meme\/(.+)\//i); },
-		isImage: function(url) { return (/jpg|png|gif|jpeg/i).test(url); },
+		isImage: function(url) { return (/\.jpg|\.png|\.gif|\.jpeg/i).test(url); },
+		isGif: function(url) { return (/\.gif/i).test(url); },
 		isImgur: function(url) { return (/imgur\.com/i).test(url); },
 		isImgurAlbum: function(url) { return (/imgur\.com\/a\//i).test(url); },
+		isImgurGallery: function(url) { return (/imgur\.com\/gallery\//i).test(url); },
 		isImgurBlog: function(url) { return (/imgur\.com\/blog\//i).test(url); },
 		isFlickr: function(url) { return (/flickr\.com/i).test(url); }
 	};
 
 	function initialiseItem(item) {
-		if (Site.isImage(item.data.url)) {
+		if (Site.isGif(item.data.url)) {
+			item.listing_type = 'image-gif';
+		} else if (Site.isImage(item.data.url)) {
 			item.listing_type = 'image';
 		} else if (Site.isQuickmeme(item.data.url)) {
 			var quickmemeId = Site.quickmemeId(item.data.url);
@@ -42,7 +46,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 				item.listing_type = 'image';
 				item.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
 			}
-		} else if (Site.isImgurAlbum(item.data.url) || Site.isImgurBlog(item.data.url)) {
+		} else if (Site.isImgurAlbum(item.data.url) || Site.isImgurGallery(item.data.url) || Site.isImgurBlog(item.data.url)) {
 			item.listing_type = 'image-album';
 		} else if (Site.isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
 			item.listing_type = 'image';
@@ -143,6 +147,12 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 	};
 
 	$scope.unescape = _.unescape;
+
+	$scope.optimiseImageUrl = function(url) {
+		var cdn = (url.length % 10) + 1;
+		var optimiseUrl = 'https://images' + cdn + '-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=400&refresh=2592000&url=';
+		return optimiseUrl + encodeURIComponent(url);
+	};
 
 	searchSelectedSubreddits();
 
