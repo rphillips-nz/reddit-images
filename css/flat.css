@@ -187,15 +187,15 @@ button:hover {
 	.listings { -ms-column-count: 4; -moz-column-count: 4; -webkit-column-count: 4; column-count: 4; }
 }
 
-@media (min-width: 1170px) {
+@media (min-width: 1250px) {
 	.listings { -ms-column-count: 5; -moz-column-count: 5; -webkit-column-count: 5; column-count: 5; }
 }
 
-@media (min-width: 1380px) {
+@media (min-width: 1540px) {
 	.listings { -ms-column-count: 6; -moz-column-count: 6; -webkit-column-count: 6; column-count: 6; }
 }
 
-@media (min-width: 1590px) {
+@media (min-width: 1830px) {
 	.listings { -ms-column-count: 7; -moz-column-count: 7; -webkit-column-count: 7; column-count: 7; }
 }
 

@@ -94,7 +94,7 @@
 
 			<div class="content">
 				<p class="title">
-					<a ng-href="{{item.data.url}}" target="_blank">{{item.data.title}}</a>
+					<a ng-href="{{item.data.url}}" target="_blank" ng-bind-html="item.data.title"></a>
 				</p>
 				
 
