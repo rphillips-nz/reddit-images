@@ -104,28 +104,82 @@ button:hover {
 
 
 .listings {
-	line-height: 1.8;
+	line-height: 1.7;
 	padding: 0;
 	margin: 0;
 }
 
-.listing:nth-child(even) {
-	background-color: #cfcfcf;
+.listings-grid {
+	-moz-column-count: 3;
+	-moz-column-gap: 0;
+	-moz-column-fill: auto;
+	-webkit-column-count: 3;
+	-webkit-column-gap: 0;
+	-webkit-column-fill: auto;
+	column-count: 3;
+	column-gap: 0;
+	column-fill: auto;
+	padding: 5px;
 }
 
-.listings .full-image {
-	width: 95%;
+@media (min-width: 100px) {
+	.listings-grid {
+		-moz-column-count: 1;
+		-webkit-column-count: 1;
+		column-count: 1;
+	}
 }
 
-.listings img {
-	padding-top: 0;
-	margin-top: 0;
-	border: 1px solid #999;
-	border-radius: 5px;
+@media (min-width: 500px) {
+	.listings-grid {
+		-moz-column-count: 2;
+		-webkit-column-count: 2;
+		column-count: 2;
+	}
 }
 
-.listing {
-	margin: 0 auto;
+@media (min-width: 960px) {
+	.listings-grid {
+		-moz-column-count: 3;
+		-webkit-column-count: 3;
+		column-count: 3;
+	}
+}
+
+@media (min-width: 1170px) {
+	.listings-grid {
+		-moz-column-count: 4;
+		-webkit-column-count: 4;
+		column-count: 4;
+	}
+}
+
+.listings-grid .listing {
+	-moz-column-break-inside: avoid;
+	-webkit-column-break-inside: avoid;
+	column-break-inside: avoid;
+	display: inline-block;
+	width: calc(100% - 25px);
+	margin: 5px;
+	padding: 5px;
+	border: 2px solid #FAFAFA;
+	box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+	background: #FEFEFE;
+	background-image: linear-gradient(45deg, #FFF, #F9F9F9);
+}
+
+.listing .full-image {
+	width: 100%;
+}
+
+.listing img {
+	padding: 0;
+	margin: 0;
+}
+
+.listing p {
+	padding: 0 10px;
+	text-align: left;
 }
 
 .listing > .content {
@@ -142,57 +196,29 @@ a:hover, a:active {
 	text-decoration: underline;
 }
 
-.controls a:link, .controls a:visited, .details a:link, .details a:visited {
+.controls a:link, .controls a:visited {
 	color: #333;
 	text-decoration: none;
 }
 
-.controls a:hover, .controls a:active, .details a:hover, .details a:active {
+.controls a:hover, .controls a:active {
 	color: #4980df;
 	text-decoration: none;
 }
 
 .controls {
 	text-align: center;
-	font-size: 1.1em;
+	font-size: 0.8em;
+	margin: 0 0 10px 0;
 }
 
-.detail + .detail, .control {
-	margin-left: 10px;
+.control {
+	padding: 0 10px;
 }
 
-.controls .open {
-	font-size: 0.95em;
-	position: relative;
-	top: -1px;
-}
-
-.num-comments {
-	position: relative;
-	top: -12px;
-	left: -9px;
-	font-size: 0.5em;
-	border: 1px solid black;
-	margin-right: -11px;
-	padding: 1px 3px;
-	display: inline-block;
-	background-color: #ddd;
-	border-radius: 10px;
-	min-width: 10px;
-}
-
-.controls, .details {
-	display: inline-block;
-}
-
-.details {
-	font-size: 0.9em;
-	position: relative;
-	top: -2px;
-}
-
-.self-text {
-	text-align: left;
+.control-text {
+	margin-left: 2px;
+	font-size: 0.8em;
 }
 
 
