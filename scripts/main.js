@@ -98,7 +98,7 @@ app.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $win
 		});
 	}
 
-	$scope.searchSelectedSubreddits = function() {
+	$scope.loadListings = function() {
 		_.chain($scope.subreddits)
 			.where({selected: true, loading: false})
 			.each(function(subreddit) { search(subreddit); });
@@ -107,7 +107,7 @@ app.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $win
 	$scope.toggleSubreddit = function(subreddit) {
 		$scope.showSubredditsDropdown = false;
 		subreddit.selected = !subreddit.selected;
-		$scope.searchSelectedSubreddits();
+		$scope.loadListings();
 	};
 
 	$scope.addSubreddit = function() {
@@ -143,9 +143,11 @@ app.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $win
 		return _.where($scope.subreddits, {selected: true, name: subredditName}).length > 0;
 	};
 
+	$scope.optimisedImageUrls = 0;
+
 	$scope.optimiseImageUrl = function(url) {
-		var cdn = (url.length % 10) + 1;
-		var optimiseUrl = 'https://images' + cdn + '-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=400&refresh=2592000&url=';
+		var optimiseUrl = 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=400&refresh=2592000&url=';
+		// var optimiseUrl = 'http://proxy.boxresizer.com/convert?resize=400x9999&source='
 		return optimiseUrl + encodeURIComponent(url);
 	};
 
@@ -162,11 +164,11 @@ app.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $win
 		$scope.showBackToTop = $window.scrollY > 30;
 		if (old !== $scope.showBackToTop) $scope.$apply();
 
-		if (window.innerHeight + document.body.scrollTop >= document.body.scrollHeight - 500) {
-			$scope.searchSelectedSubreddits();
+		if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 500) {
+			$scope.loadListings();
 		}
 
 	}, 300));
 
-	$scope.searchSelectedSubreddits();
+	$scope.loadListings();
 }]);

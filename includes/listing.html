@@ -17,11 +17,6 @@
 			<img ng-src="{{listing.data.media.oembed.thumbnail_url}}" onerror="this.style.display='none'"/>
 			<span class="play"><span></span></span>
 		</a>
-<!--
-		<div class="video-container" ng-switch-when="media">
-			<div ng-bind-html="unescape(listing.data.media.oembed.html)"></div>
-		</div>
--->
 	</div>
 
 	<div class="content">
@@ -34,7 +29,6 @@
 		<div class="controls">
 			<span class="control"><i class="icon-heart"></i><span class="control-text">{{listing.data.score}}</span></span>
 			<a class="control" ng-href="http://www.reddit.com{{listing.data.permalink}}" target="_blank" ><i class="icon-comment"></i><span class="control-text">{{listing.data.num_comments}}</span></a>
-			<a class="control" ng-href="http://www.reddit.com/u/{{listing.data.author}}" target="_blank"><i class="icon-user"></i><span class="control-text">{{listing.data.author}}</span></a>
 		</div>
 	</div>
 </div>
