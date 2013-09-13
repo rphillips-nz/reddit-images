@@ -1,0 +1,40 @@
+<div class="listing {{listing.listing_type}}" ng-show="isSelected(listing.subreddit.name)">
+	<div ng-switch on="listing.listing_type">
+		<a ng-switch-when="image" class="full-image" ng-href="{{listing.data.url}}" target="_blank">
+			<img ng-src="{{optimiseImageUrl(listing.data.url)}}" onerror="this.style.display='none'"/>
+		</a>
+		<a ng-switch-when="image-gif" class="full-image" ng-href="{{listing.data.url}}" target="_blank">
+			<img ng-src="{{listing.data.url}}" onerror="this.style.display='none'"/>
+		</a>
+		<a ng-switch-when="image-album" class="thumbnail" ng-href="{{listing.data.url}}" target="_blank">
+			<img ng-src="{{listing.data.thumbnail}}" ui-if="listing.data.thumbnail != 'default'" onerror="this.style.display='none'" />
+		</a>
+		<a ng-switch-when="image-thumbnail" class="thumbnail" ng-href="{{listing.data.url}}" target="_blank">
+			<img ng-src="{{listing.data.thumbnail}}" onerror="this.style.display='none'" />
+		</a>
+
+		<a ng-switch-when="media" class="full-image media" ng-href="{{listing.data.url}}" target="_blank">
+			<img ng-src="{{listing.data.media.oembed.thumbnail_url}}" onerror="this.style.display='none'"/>
+			<span class="play"><span></span></span>
+		</a>
+<!--
+		<div class="video-container" ng-switch-when="media">
+			<div ng-bind-html="unescape(listing.data.media.oembed.html)"></div>
+		</div>
+-->
+	</div>
+
+	<div class="content">
+		<p class="title">
+			<a ng-href="{{listing.data.url}}" target="_blank" ng-bind-html="listing.data.title"></a>
+		</p>
+
+		<p ng-if="listing.data.selftext_html" ng-bind-html="unescape(listing.data.selftext_html)" class="self-text"></p>
+
+		<div class="controls">
+			<span class="control"><i class="icon-heart"></i><span class="control-text">{{listing.data.score}}</span></span>
+			<a class="control" ng-href="http://www.reddit.com{{listing.data.permalink}}" target="_blank" ><i class="icon-comment"></i><span class="control-text">{{listing.data.num_comments}}</span></a>
+			<a class="control" ng-href="http://www.reddit.com/u/{{listing.data.author}}" target="_blank"><i class="icon-user"></i><span class="control-text">{{listing.data.author}}</span></a>
+		</div>
+	</div>
+</div>

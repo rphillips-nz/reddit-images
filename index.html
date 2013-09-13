@@ -24,8 +24,8 @@
 	<section class="header">
 		<h1>Reddit Images <i class="icon-down-open button-icon" ng-click="showSubredditsDropdown = !showSubredditsDropdown"></i></h1>
 
-		<ul class="subreddits-dropdown" ng-show="showSubredditsDropdown">
-			<li class="subreddit-dropdown"
+		<ul class="dropdown-menu" ng-show="showSubredditsDropdown">
+			<li class="dropdown-item"
 			    ng-repeat="subreddit in subreddits"
 			    ng-click="removeOpen ? removeSubreddit(subreddit) : toggleSubreddit(subreddit)"
 			    ng-class="{selected: subreddit.selected}">
@@ -61,55 +61,13 @@
 		</div>
 	</section>
 
-	<ul class="listings">
-		<li class="listing {{item.listing_type}}"
-		    ng-repeat="item in items | orderBy:'index'"
-		    ng-show="isSelected(item.subreddit.name)">
+	<div ng-repeat="page in pages">
+		<ul class="listings">
+			<li ng-repeat="listing in page | orderBy:'index'" ng-include="'includes/listing.html'"></li>
+		</ul>
+	</div>
 
-			<div ng-switch on="item.listing_type">
-				<a ng-switch-when="image" class="full-image" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{optimiseImageUrl(item.data.url)}}" onerror="this.style.display='none'"/>
-				</a>
-				<a ng-switch-when="image-gif" class="full-image" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{item.data.url}}" onerror="this.style.display='none'"/>
-				</a>
-				<a ng-switch-when="image-album" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{item.data.thumbnail}}" ui-if="item.data.thumbnail != 'default'" onerror="this.style.display='none'" />
-				</a>
-				<a ng-switch-when="image-thumbnail" class="thumbnail" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{item.data.thumbnail}}" onerror="this.style.display='none'" />
-				</a>
-
-
-				<a ng-switch-when="media" class="full-image media" ng-href="{{item.data.url}}" target="_blank">
-					<img ng-src="{{item.data.media.oembed.thumbnail_url}}" onerror="this.style.display='none'"/>
-					<span class="play"><span></span></span>
-				</a>
-<!--
-				<div class="video-container" ng-switch-when="media">
-					<div ng-bind-html="unescape(item.data.media.oembed.html)"></div>
-				</div>
--->
-			</div>
-
-			<div class="content">
-				<p class="title">
-					<a ng-href="{{item.data.url}}" target="_blank" ng-bind-html="item.data.title"></a>
-				</p>
-				
-
-				<p ng-if="item.data.selftext_html" ng-bind-html="unescape(item.data.selftext_html)" class="self-text"></p>
-
-				<div class="controls">
-					<span class="control"><i class="icon-heart"></i><span class="control-text">{{item.data.score}}</span></span>
-					<a class="control" ng-href="http://www.reddit.com{{item.data.permalink}}" target="_blank" ><i class="icon-comment"></i><span class="control-text">{{item.data.num_comments}}</span></a>
-					<a class="control" ng-href="http://www.reddit.com/u/{{item.data.author}}" target="_blank"><i class="icon-user"></i><span class="control-text">{{item.data.author}}</span></a>
-				</div>
-
-			</div>
-
-		</li>
-	</ul>
+	<img ng-show="isLoading()" class="loader" src="images/loading.gif" width="32" height="32"/>
 
 </body>
 

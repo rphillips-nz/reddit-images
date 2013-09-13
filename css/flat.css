@@ -3,6 +3,7 @@ body {
 	font-weight: 300;
 	color: #444;
 	background-color: #ddd;
+	background: url(../images/background.png);
 	margin: 0;
 	padding: 0;
 }
@@ -35,7 +36,6 @@ pre {
 	z-index: 10;
 }
 
-
 .header {
 	box-shadow: 0 1px 2px rgba(25, 25, 25, 0.4);
 	background-color: #fefefe;
@@ -54,14 +54,21 @@ pre {
 	align-items: center;
 }
 
-.subreddits-dropdown {
+.dropdown-menu {
 	position: absolute;
 	top: 35px;
 	left: 0px;
 	background-color: white;
 	border: 1px solid #acacac;
-	padding: 10px;
 	box-shadow: 0 1px 2px rgba(25, 25, 25, 0.4);
+}
+
+.dropdown-item {
+	padding: 2px 5px;
+}
+
+.dropdown-item:hover {
+	background-color: #ededfa;
 }
 
 .subreddits {
@@ -94,11 +101,11 @@ pre {
 	margin: 0;
 }
 
-.subreddit-dropdown, .subreddit {
+.dropdown-item, .subreddit {
 	cursor: pointer;
 }
 
-.subreddits-dropdown .selected, .subreddits .selected {
+.dropdown-item .selected, .subreddits .selected {
 	color: #4980df;
 }
 
@@ -108,8 +115,6 @@ pre {
 	top: -5px;
 	color: #7e2a68;
 }
-
-
 
 .subreddit-controls, .add-form, .remove-form {
 	height: 28px;
@@ -153,7 +158,6 @@ button:hover {
 	color: #4980df;
 	cursor: pointer;
 }
-
 
 .listings {
 	-ms-column-count: 1;
@@ -262,10 +266,6 @@ button:hover {
 	opacity: 1;
 }
 
-.media {
-
-}
-
 .listing .thumbnail img {
 	padding: 0;
 	border-radius: 3px;
@@ -339,7 +339,11 @@ a:hover, a:active {
 	font-size: 0.8em;
 }
 
-
+.loader {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+}
 
 .video-container {
 	position: relative;

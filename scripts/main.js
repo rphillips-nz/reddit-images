@@ -1,15 +1,17 @@
-angular.module('main', ['ngResource', 'ngSanitize'])
+var app = angular.module('main', ['ngResource', 'ngSanitize']);
 
-.factory('Reddit', ['$resource', function($resource) {
+app.factory('Reddit', ['$resource', function($resource) {
 	return $resource(
 		'http://www.reddit.com/r/:subreddit/hot.json',
 		{subreddit: '@subreddit'},
-		{get: {method: 'JSONP', params: {jsonp: 'JSON_CALLBACK'}}}
+		{get: {method: 'JSONP', params: {after: '@after', jsonp: 'JSON_CALLBACK'}}}
 	);
-}])
+}]);
 
-.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $window, Reddit) {
-	$scope.items = [];
+app.controller('MainCtrl', ['$scope', '$window', 'Reddit', function($scope, $window, Reddit) {
+	$scope.unescape = _.unescape;
+	$scope.listings = [];
+	$scope.pages = [];
 
 	if (localStorage['subreddits']) {
 		$scope.subreddits = JSON.parse(localStorage['subreddits']);
@@ -19,7 +21,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 
 	$scope.$watch('subreddits', function() {
 		localStorage['subreddits'] = JSON.stringify(_.map($scope.subreddits, function(subreddit) {
-			return {name: subreddit.name, selected: subreddit.selected, searched: false};
+			return {name: subreddit.name, selected: subreddit.selected, loading: false, loads: 0};
 		}));
 	}, true);
 
@@ -35,72 +37,77 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 		isFlickr: function(url) { return (/flickr\.com/i).test(url); }
 	};
 
-	function initialiseItem(item) {
-		if (Site.isGif(item.data.url)) {
-			item.listing_type = 'image-gif';
-		} else if (Site.isImage(item.data.url)) {
-			item.listing_type = 'image';
-		} else if (Site.isQuickmeme(item.data.url)) {
-			var quickmemeId = Site.quickmemeId(item.data.url);
+	function initialiseListing(listing) {
+		if (Site.isGif(listing.data.url)) {
+			listing.listing_type = 'image-gif';
+		} else if (Site.isImage(listing.data.url)) {
+			listing.listing_type = 'image';
+		} else if (Site.isQuickmeme(listing.data.url)) {
+			var quickmemeId = Site.quickmemeId(listing.data.url);
 			if (quickmemeId.length > 0) {
-				item.listing_type = 'image';
-				item.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
+				listing.listing_type = 'image';
+				listing.data.url = 'http://i.qkme.me/' + quickmemeId[1] + '.jpg';
 			}
-		} else if (Site.isImgurAlbum(item.data.url) || Site.isImgurGallery(item.data.url) || Site.isImgurBlog(item.data.url)) {
-			item.listing_type = 'image-album';
-		} else if (Site.isImgur(item.data.url) && !(/#\d+/i).test(item.data.url)) { // TODO links to imgur #1, #2 etc
-			item.listing_type = 'image';
-			item.data.url = item.data.url + '.png';
-		} else if (Site.isFlickr(item.data.url)) {
-			item.listing_type = 'image-thumbnail';
-		} else if (null !== item.data.media) {
-			item.listing_type = 'media';
-		} else if (item.data.is_self) {
-			item.listing_type = 'post';
+		} else if (Site.isImgurAlbum(listing.data.url) || Site.isImgurGallery(listing.data.url) || Site.isImgurBlog(listing.data.url)) {
+			listing.listing_type = 'image-album';
+		} else if (Site.isImgur(listing.data.url) && !(/#\d+/i).test(listing.data.url)) { // TODO links to imgur #1, #2 etc
+			listing.listing_type = 'image';
+			listing.data.url = listing.data.url + '.png';
+		} else if (Site.isFlickr(listing.data.url)) {
+			listing.listing_type = 'image-thumbnail';
+		} else if (null !== listing.data.media) {
+			listing.listing_type = 'media';
+		} else if (listing.data.is_self) {
+			listing.listing_type = 'post';
 		} else {
-			item.listing_type = 'link';
+			listing.listing_type = 'link';
 		}
 
-		return item;
+		return listing;
 	}
 
 	function resetDefaultSubreddits() {
 		$scope.subreddits = [
-			{name: 'fixedgearbicycle', selected: false, searched: false},
-			{name: 'gaming', selected: false, searched: false},
-			{name: 'funny', selected: false, searched: false},
-			{name: 'gifs', selected: false, searched: false},
-			{name: 'pictures', selected: false, searched: false},
-			{name: 'snowboarding', selected: false, searched: false},
-			{name: 'cats', selected: false, searched: false},
-			{name: 'aww', selected: false, searched: false}
+			{name: 'fixedgearbicycle', selected: false, loading: false, loads: 0},
+			{name: 'gaming', selected: false, loading: false, loads: 0},
+			{name: 'funny', selected: false, loading: false, loads: 0},
+			{name: 'gifs', selected: false, loading: false, loads: 0},
+			{name: 'pictures', selected: false, loading: false, loads: 0},
+			{name: 'snowboarding', selected: false, loading: false, loads: 0},
+			{name: 'cats', selected: false, loading: false, loads: 0},
+			{name: 'aww', selected: false, loading: false, loads: 0}
 		];
 	}
 
 	function search(subreddit) {
-		subreddit.searched = true;
+		subreddit.loading = true;
+		subreddit.loads += 1;
+		var query = subreddit.after ? {subreddit: subreddit.name, after: subreddit.after} : {subreddit: subreddit.name};
 
-		Reddit.get({subreddit: subreddit.name}, function success(result) {
-			_.each(result.data.children, function(item, index) {
-				initialiseItem(item);
-				item.subreddit = subreddit;
-				item.index = index;
+		Reddit.get(query, function ok(result) {
+			_.each(result.data.children, function(listing, index) {
+				initialiseListing(listing);
+				listing.subreddit = subreddit;
+				listing.index = index;
 			});
 
-			$scope.items = $scope.items.concat(result.data.children);
+			$scope.pages[subreddit.loads - 1] = $scope.pages[subreddit.loads - 1] || [];
+			$scope.pages[subreddit.loads - 1] = $scope.pages[subreddit.loads - 1].concat(result.data.children);
+			subreddit.after = result.data.after;
+			subreddit.loading = false;
 		});
 	}
 
-	function searchSelectedSubreddits() {
+	$scope.searchSelectedSubreddits = function() {
 		_.chain($scope.subreddits)
-			.where({selected: true, searched: false})
+			.where({selected: true, loading: false})
 			.each(function(subreddit) { search(subreddit); });
-	}
+	};
 
 	$scope.toggleSubreddit = function(subreddit) {
 		$scope.showSubredditsDropdown = false;
 		subreddit.selected = !subreddit.selected;
-		searchSelectedSubreddits();
+		$scope.searchSelectedSubreddits();
 	};
 
 	$scope.addSubreddit = function() {
@@ -111,7 +118,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 			existing.selected = true;
 			search(existing);
 		} else if (name !== '') {
-			var newSubreddit = {name: $scope.newSubredditName, selected: true, searched: false};
+			var newSubreddit = {name: $scope.newSubredditName, selected: true, loading: false, loads: 0};
 			$scope.subreddits.push(newSubreddit);
 			search(newSubreddit);
 		}
@@ -122,7 +129,7 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 
 	$scope.removeSubreddit = function(subreddit) {
 		$scope.subreddits = _.reject($scope.subreddits, function(s) { return subreddit === s; });
-		$scope.items = _.reject($scope.items, function(i) { return subreddit == i.subreddit; });
+		$scope.listings = _.reject($scope.listings, function(listing) { return subreddit == listing.subreddit; });
 	};
 
 	$scope.openSubredditForm = function() {
@@ -132,21 +139,9 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 		});
 	};
 
-	$scope.scrollTop = function() {
-		$window.scroll();
-	};
-
-	angular.element($window).bind('scroll', _.throttle(function() {
-		var old = $scope.showBackToTop;
-		$scope.showBackToTop = $window.scrollY > 30;
-		if (old !== $scope.showBackToTop) $scope.$apply();
-	}, 300));
-
 	$scope.isSelected = function(subredditName) {
 		return _.where($scope.subreddits, {selected: true, name: subredditName}).length > 0;
 	};
-
-	$scope.unescape = _.unescape;
 
 	$scope.optimiseImageUrl = function(url) {
 		var cdn = (url.length % 10) + 1;
@@ -154,6 +149,24 @@ angular.module('main', ['ngResource', 'ngSanitize'])
 		return optimiseUrl + encodeURIComponent(url);
 	};
 
-	searchSelectedSubreddits();
+	$scope.isLoading = function() {
+		return _.some($scope.subreddits, function(subreddit) { return subreddit.loading; });
+	};
 
+	$scope.scrollTop = function() {
+		$window.scrollTo(0, 0);
+	};
+
+	angular.element($window).bind('scroll', _.throttle(function() {
+		var old = $scope.showBackToTop;
+		$scope.showBackToTop = $window.scrollY > 30;
+		if (old !== $scope.showBackToTop) $scope.$apply();
+
+		if (window.innerHeight + document.body.scrollTop >= document.body.scrollHeight - 500) {
+			$scope.searchSelectedSubreddits();
+		}
+
+	}, 300));
+
+	$scope.searchSelectedSubreddits();
 }]);
